@@ -1,0 +1,20 @@
+var variantSetIds = {
+    "cervix": 6, 
+    "stomach": 16, 
+    "liver": 10, 
+    "skin": 15, 
+    "bladder": 1, 
+    "brain": 2, 
+    "head and neck": 5, 
+    "lung": 12, 
+    "breast": 4, 
+    "colorectal": 7, 
+    "kidney": 9, 
+    "uterus": 17, 
+    "esophagus": 8, 
+    "pancreas": 13, 
+    "prostate": 14, 
+    "ovary": 11, 
+    "bone": 3, 
+    "blood": 0
+  }

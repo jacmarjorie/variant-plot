@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+
+  <script src="lib/d3/d3.min.js"></script>
+  <script src="lib/plugins/d3plus.min.js"></script>
+  <script src="lib/jquery/jquery.min.js"></script>
+  <script src="lib/jquery-ui/jquery-ui.min.js"></script>
+  <script src="lib/bootstrap/js/bootstrap.min.js"></script>
+  <script src="lib/plugins/d3tip.js"></script>
+  <script src="lib/plugins/spin.min.js"></script>
+  <script src="lib/plugins/ladda.min.js"></script>
+  <script src="lib/plugins/c3.min.js"></script>
+  <script src="lib/plugins/typeahead.min.js"></script>
+  <script src="lib/plugins/lodash.min.js"></script>
+  <!--<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>-->
+  <!--<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script> -->
+  <link href="lib/ajax/jquery.min.js"/>
+  <link href="lib/bootstrap/js/bootstrap.js"/>
+  <link href="lib/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="src/css/d3tip.css" rel="stylesheet" />
+  <link href="src/css/ladda-themeless.min.css" rel="stylesheet"/>
+  <link href="src/css/c3.css" rel="stylesheet" />
+  <link href="src/css/main.css" rel="stylesheet" />
+
+  
+  <title>Variant Store</title>
+</head>
+<!-- <body onload='loadUserName()'> -->
+<body>
+
+<header class="header-login-signup">
+
+    <div class="header-limiter">
+
+    </div><br><br><br>
+    <div class="project">
+        <h1><span class="left">Variant Store</span></h1>
+        </div>
+    </header>
+
+  <div class="container-fluid" style="margin-top: 50px;">
+    <div role="tabpanel">
+      <ul class="nav nav-tabs" id="tablist" role="tablist">
+      </ul>    
+       
+      <div class="tab-content" id="tab_content">
+      </div>
+    </div>
+  <div>
+  </div>
+  
+
+  <script src="conf.js"></script>
+  <script src="src/js/main.js"></script>
+
+  <script src="src/js/VariantByGeneWidget.js"></script>
+  <script src="src/js/plots.js"></script>
+  
+  <script src="src/js/data/gene_census.js"></script>
+  <script src="src/js/data/variantSetIds.js"></script>
+<!--   // <script src="js/json/projects.js"></script> -->
+<!--   // <script src="js/json/projects_by_type.js"></script> -->
+  <script src="src/js/data/callSetId2VS.js"></script>
+  <script src="src/js/data/just_genes.js"></script>
+  <script src="src/js/data/tp53.js"></script>
+  <!-- COUNT FILES -->
+  <script src="src/js/data/counts_space/raw_gene_counts_norm.js"></script>
+  <script src="src/js/data/counts_space/raw_gene_counts_norm_tail.js"></script>
+  <script src="src/js/data/counts_space/bladder.js"></script>
+  <script src="src/js/data/counts_space/blood.js"></script>
+  <script src="src/js/data/counts_space/bone.js"></script>
+  <script src="src/js/data/counts_space/brain.js"></script>
+  <script src="src/js/data/counts_space/breast.js"></script>
+  <script src="src/js/data/counts_space/cervix.js"></script>
+  <script src="src/js/data/counts_space/colorectal.js"></script>
+  <script src="src/js/data/counts_space/esophagus.js"></script>
+  <script src="src/js/data/counts_space/head.js"></script>
+  <script src="src/js/data/counts_space/kidney.js"></script>
+  <script src="src/js/data/counts_space/liver.js"></script>
+  <script src="src/js/data/counts_space/lung.js"></script>
+  <script src="src/js/data/counts_space/ovary.js"></script>
+  <script src="src/js/data/counts_space/pancreas.js"></script>
+  <script src="src/js/data/counts_space/prostate.js"></script>
+  <script src="src/js/data/counts_space/skin.js"></script>
+  <script src="src/js/data/counts_space/stomach.js"></script>
+  <script src="src/js/data/counts_space/uterus.js"></script>
+		
+		<!-- import jQuery for AJAX calls (must) -->
+		<!--<script type="text/javascript" src="https://code.jquery.com/jquery-1.11.0.min.js"></script>-->
+		
+		<!-- import Bootstrap for responsive UI (must) -->
+		<!--<script src="https://netdna.bootstrapcdn.com/bootstrap/3.0.0/js/bootstrap.min.js"></script>	-->
+
+  </div>
+
+<div>
+    <div class="container">
+        <p>
+            <input type="button" onclick="removeCache()" value="Logout" size="20">
+        </p>
+    </div>
+</div>
+
+<script type='text/javascript'>
+    function removeCache(){
+
+        $.ajax({
+            url: window.localStorage.idProviderIssuer+"logout",
+            type: 'get',
+            xhrFields: {
+                withCredentials: true
+            },
+            success: function(result){
+
+                window.localStorage.clear();
+
+                $url = getAbsolutePath() + "login.html";
+                window.location.replace($url);
+            }
+
+        });
+    }
+    function getAbsolutePath() {
+        var loc = window.location;
+        var pathName = loc.pathname.substring(0, loc.pathname.lastIndexOf('/') + 1);
+        return loc.href.substring(0, loc.href.length - ((loc.pathname + loc.search + loc.hash).length - pathName.length));
+    }
+
+</script>
+
+</body>
+</html>
+  

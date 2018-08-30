@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+<head>
+
+
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <link rel="shortcut icon" href="src/img/CCC-projectidentitymark.ico">
+
+  <script src="lib/d3/d3.min.js"></script>
+  <script src="lib/plugins/d3plus.min.js"></script>
+  <script src="lib/jquery/jquery.min.js"></script>
+  <script src="lib/jquery-ui/jquery-ui.min.js"></script>
+  <script src="lib/bootstrap/js/bootstrap.min.js"></script>
+  <script src="lib/plugins/d3tip.js"></script>
+  <script src="lib/plugins/spin.min.js"></script>
+  <script src="lib/plugins/ladda.min.js"></script>
+  <script src="lib/plugins/c3.min.js"></script>
+  <script src="lib/plugins/typeahead.min.js"></script>
+  <script src="lib/plugins/lodash.min.js"></script>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+  <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+  <link href="lib/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="src/css/d3tip.css" rel="stylesheet" />
+  <link href="src/css/ladda-themeless.min.css" rel="stylesheet"/>
+  <link href="src/css/c3.css" rel="stylesheet" />
+  <link href="src/css/main.css" rel="stylesheet" />
+
+  <link rel="stylesheet" href="src/css/ccc/header-ccc.css">
+  
+  <script src="conf.js"></script>
+  
+  <title>Variant Store</title>
+</head>
+<body onload='loadFederatedIds()'>
+
+<header class="header-login-signup">
+
+    <div class="header-limiter">
+
+      <h1>
+        <a href="#"><img src="src/img/CCC-projectidentitymark.png" alt="CCC Project Identity Mark" height="60"></a>          </h1>
+
+
+    </div><br><br><br>
+
+  <div class="project">
+    <h1>Welcome to Variant Store! Please Sign in first.</h1>
+  </div>
+
+
+  </header>
+  
+  <div class="container-fluid" style="margin-top: 50px;">
+    <div role="tabpanel">    
+      		<div class="container">			
+			<p>
+				<h2> Please Login With </h2>	
+				<select id="dynamicFill" multiple="multiple">
+					<option> Please select</option>
+				</select>
+			</p>
+				<p>
+				<input type="button" onclick="selectedOption()" value="Login" size="20">
+				</p>
+						
+			<h2 id="status"/>
+		</div>      
+    </div>
+
+		<script type='text/javascript'>
+	    function selectedOption(){
+	    	var str = "";
+	    	for (i=0;i<dynamicFill.options.length;i++) {
+	    	    if (dynamicFill.options[i].selected) {
+	    	        str = str+dynamicFill.options[i].value;
+	    	    }
+	    	}
+	    	
+	    	window.localStorage["idProviderName"] = str;
+	  
+	    	//0. get idProviderData
+	    	getIdProviderData(str);
+	    	
+	    	//1. get auth_request html page 
+	    	loadJS(str);
+	    }
+	    </script>
+		
+    <script type='text/javascript'>
+	function getIdProviderData(v){
+		
+		$.ajax({
+			url: fedidservice_path + '/v1/manage/idprovider/'+v,
+			type: 'get',
+		    dataType: 'text',
+		    success: function(result){
+		    	var obj = JSON.parse(result);
+				window.localStorage["idProviderIssuer"] =  obj.issuer;
+				window.localStorage["idProviderRedirectUri"] = obj.redirectUri;
+			}
+		
+		});
+		
+	}
+	</script> 	
+			
+	<script type='text/javascript'>
+	function loadJS(v){
+
+		var jsonInput = {"redirectUri": redirecturi};
+		
+		$.ajax({
+			url: fedidservice_path + '/v1/federatedid/idprovider/'+v,
+			type: 'post',
+		    dataType: 'text',
+		    contentType: 'application/json; character=utf-8',
+				data: JSON.stringify(jsonInput),
+		    success: function(result){
+		    	// 2. open login page in a popup window
+		    	OpenPopUpWindow(result);
+	                   
+			},
+			error: function(data) {
+							console.log(data);
+			}
+		
+		});
+		
+	}
+	</script> 
+	
+	<script type='text/javascript'>
+	function OpenPopUpWindow(url){
+		var auth_code="";
+		
+		var win = window.open(url,"Login","menubar=1,resizable=1,width=600,height=600");
+    	
+        var pollTimer   =   window.setInterval(function() { 
+            try {
+                if (win.document.URL.indexOf("code=") != -1) {
+                    window.clearInterval(pollTimer);
+                    var url =   win.document.URL;
+
+                    // 3. get auth_code from url for the getToken call
+                    this.auth_code = getAuthCodeFromUrl(url,'code');
+                                       	
+                    win.close();
+                    
+                    // 4. get tokens with auth_code
+                    getToken(this.auth_code);
+                   
+                }
+            } catch(e) {
+            	console.log("Waiting for url of the same domain as window: " + window.document.URL);
+            }
+             
+        }, 100);    
+		
+	}
+	
+	</script>
+
+		
+	<script type='text/javascript'>
+	function loadFederatedIds()
+	{
+		var $select = $('#dynamicFill');  
+		$.ajax({ 
+			   type: 'GET',
+			   dataType: 'json',
+			   cache : false,
+			  url: fedidservice_path + '/v1/manage/idproviders',
+			   success: function(resp){     
+			   	$.each(resp,function(key, value) 
+			    {
+				   $select.append('<option value' + value.name + '>' + value.name + '</option>');
+				});
+				}
+			});
+	}
+	</script>	
+	
+	<script type='text/javascript'>
+	function getAuthCodeFromUrl(url,name)
+	{
+		name = name.replace(/[[]/,"\[").replace(/[]]/,"\]");
+        var regexS = "[\?&]"+name+"=([^&#]*)";
+        var regex = new RegExp( regexS );
+        var results = regex.exec( url );
+        if( results == null )
+            return "";
+        else
+            return results[1];
+	}
+	</script>
+	
+	<script type='text/javascript'>
+	function getToken(code)
+	{
+		var jsonInput = {"idProvider": window.localStorage.idProviderName,
+				         "authorizationCode": code,
+						 "issuer": window.localStorage.idProviderIssuer,
+						 "redirectUri": redirecturi};
+		
+		$.ajax({ 
+			   type: 'post',
+			   dataType: 'json',
+			   url: fedidservice_path + '/v1/federatedid/tokens/',
+			   contentType: 'application/json; character=utf-8',
+			   data: JSON.stringify(jsonInput),
+			   
+			   success: function(resp){     
+			   	 storeTokenValues(resp);
+				}
+			   ,
+				error: function(data) {
+					console.log(data);
+				}
+			});
+		
+	}
+	
+	function storeTokenValues(result)
+	{
+		$.each(result,function(key, value)  {
+			   if(key === "tokens") {
+			   		window.localStorage["tokens"] = value;
+			   }
+		 	 });
+
+	    $url = getAbsolutePath() + "index.html";
+		window.location.replace($url);
+	}
+
+	function getAbsolutePath() {
+		var loc = window.location;
+		var pathName = loc.pathname.substring(0, loc.pathname.lastIndexOf('/') + 1);
+		return loc.href.substring(0, loc.href.length - ((loc.pathname + loc.search + loc.hash).length - pathName.length));
+	}
+	</script>
+
+	</div>
+</body>
+</html>
